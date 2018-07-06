@@ -103,16 +103,30 @@ class _CategoryRouteState extends State<CategoryRoute> {
   /// device is portrait or landscape.
   ///
   /// For portrait, we use a [ListView]. For landscape, we use a [GridView].
-  Widget _buildCategoryWidgets() {
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        return CategoryTile(
-          category: _categories[index],
-          onTap: _onCategoryTap,
-        );
-      },
-      itemCount: _categories.length,
-    );
+  Widget _buildCategoryWidgets(Orientation orientation) {
+    if (orientation == Orientation.portrait) {
+      return ListView.builder(
+        itemBuilder: (BuildContext context, int index) {
+          return CategoryTile(
+            category: _categories[index],
+            onTap: _onCategoryTap,
+          );
+        },
+        itemCount: _categories.length,
+      );
+    } else {
+      return GridView.count(
+          crossAxisCount: 2,
+          childAspectRatio: 3.0,
+          children: _categories.map((Category category) {
+            return GridTile(
+              child: CategoryTile(
+                category: category,
+                onTap: _onCategoryTap,
+              ),
+            );
+          }).toList());
+    }
   }
 
   /// Returns a list of mock [Unit]s.
@@ -134,7 +148,7 @@ class _CategoryRouteState extends State<CategoryRoute> {
         right: 8.0,
         bottom: 48.0,
       ),
-      child: _buildCategoryWidgets(),
+      child: _buildCategoryWidgets(MediaQuery.of(context).orientation),
     );
 
     return Backdrop(
