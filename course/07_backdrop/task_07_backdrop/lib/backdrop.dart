@@ -147,10 +147,50 @@ class _BackdropState extends State<Backdrop>
     // This creates an [AnimationController] that can allows for animation for
     // the BackdropPanel. 0.00 means that the front panel is in "tab" (hidden)
     // mode, while 1.0 means that the front panel is open.
+
+    //This one is animation controller for the animated icon inside appbar
+    //icon: AnimatedIcon(
+    //      icon: AnimatedIcons.close_menu,
+    //      progress: _controller.view,
+    //),
+    //0.0 will display menu icon, 1.0 will display close icon
+    //duration is the time that passes when changing from one icon to another(0.0,1.0)
     _controller = AnimationController(
       duration: Duration(milliseconds: 300),
       value: 1.0,
       vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    //need to dispose the animation controller
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: widget.currentCategory.color,
+        elevation: 0.0,
+        leading: IconButton(
+          onPressed: _toggleBackdropPanelVisibility,
+          icon: AnimatedIcon(
+            icon: AnimatedIcons.close_menu,
+            progress: _controller.view,
+          ),
+        ),
+        title: _BackdropTitle(
+          listenable: _controller.view,
+          frontTitle: widget.frontTitle,
+          backTitle: widget.backTitle,
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: _buildStack,
+      ),
     );
   }
 
@@ -168,12 +208,6 @@ class _BackdropState extends State<Backdrop>
         _controller.fling(velocity: _kFlingVelocity);
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   bool get _backdropPanelVisible {
@@ -250,28 +284,4 @@ class _BackdropState extends State<Backdrop>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: widget.currentCategory.color,
-        elevation: 0.0,
-        leading: IconButton(
-          onPressed: _toggleBackdropPanelVisibility,
-          icon: AnimatedIcon(
-            icon: AnimatedIcons.close_menu,
-            progress: _controller.view,
-          ),
-        ),
-        title: _BackdropTitle(
-          listenable: _controller.view,
-          frontTitle: widget.frontTitle,
-          backTitle: widget.backTitle,
-        ),
-      ),
-      body: LayoutBuilder(
-        builder: _buildStack,
-      ),
-    );
-  }
 }
