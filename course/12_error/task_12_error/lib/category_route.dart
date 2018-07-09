@@ -32,6 +32,7 @@ class CategoryRoute extends StatefulWidget {
 class _CategoryRouteState extends State<CategoryRoute> {
   Category _defaultCategory;
   Category _currentCategory;
+
   // Widgets are supposed to be deeply immutable objects. We can update and edit
   // _categories as we build our app, and when we pass it into a widget's
   // `children` property, we call .toList() on it.
@@ -177,9 +178,13 @@ class _CategoryRouteState extends State<CategoryRoute> {
         itemBuilder: (BuildContext context, int index) {
           // TODO: You may want to make the Currency [Category] not tappable
           // while it is loading, or if there an error.
+          final _category = _categories[index];
           return CategoryTile(
-            category: _categories[index],
-            onTap: _onCategoryTap,
+            category: _category,
+            onTap: (_category.name == apiCategory['name'] &&
+                    _category.units.isEmpty)
+                ? null
+                : _onCategoryTap,
           );
         },
         itemCount: _categories.length,

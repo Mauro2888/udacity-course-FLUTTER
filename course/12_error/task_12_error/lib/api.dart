@@ -41,12 +41,18 @@ class Api {
   /// Returns a list. Returns null on error.
   Future<List> getUnits(String category) async {
     final uri = Uri.https(_url, '/$category');
-    final jsonResponse = await _getJson(uri);
-    if (jsonResponse == null || jsonResponse['units'] == null) {
-      print('Error retrieving units.');
+    try {
+      final jsonResponse = await _getJson(uri);
+      try {
+        return jsonResponse['units'];
+      } on Exception catch (e) {
+        print('Error: $e');
+        return null;
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
       return null;
     }
-    return jsonResponse['units'];
   }
 
   /// Given two units, converts from one to another.

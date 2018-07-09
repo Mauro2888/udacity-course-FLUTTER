@@ -36,7 +36,9 @@ class _UnitConverterState extends State<UnitConverter> {
   List<DropdownMenuItem> _unitMenuItems;
   bool _showValidationError = false;
   final _inputKey = GlobalKey(debugLabel: 'inputText');
+
   // TODO: Add a flag for whether to show error UI
+  bool _showErrorUI = false;
 
   @override
   void initState() {
@@ -110,9 +112,15 @@ class _UnitConverterState extends State<UnitConverter> {
       final conversion = await api.convert(apiCategory['route'],
           _inputValue.toString(), _fromValue.name, _toValue.name);
       // TODO: Check whether to show an error UI
-      setState(() {
-        _convertedValue = _format(conversion);
-      });
+      if (conversion == null) {
+        setState(() {
+          _showErrorUI = true;
+        });
+      } else {
+        setState(() {
+          _convertedValue = _format(conversion);
+        });
+      }
     } else {
       // For the static units, we do the conversion ourselves
       setState(() {
@@ -204,6 +212,10 @@ class _UnitConverterState extends State<UnitConverter> {
   @override
   Widget build(BuildContext context) {
     // TODO: Build an error UI
+    if (widget.category.units == null ||
+        (widget.category.name == apiCategory['name'] && _showErrorUI)) {
+      return _getErrorUI();
+    }
 
     final input = Padding(
       padding: _padding,
@@ -290,6 +302,37 @@ class _UnitConverterState extends State<UnitConverter> {
             );
           }
         },
+      ),
+    );
+  }
+
+  Widget _getErrorUI() {
+    return SingleChildScrollView(
+      child: Container(
+        margin: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          border: Border.all(color: Colors.transparent),
+          borderRadius: BorderRadius.circular(26.0),
+        ),
+        child: Column(
+          children: <Widget>[
+            Icon(
+              Icons.error_outline,
+              size: 150.0,
+              color: Colors.white,
+            ),
+            Text(
+              'Oh no! We can\'t connect right now!',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 23.0,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
